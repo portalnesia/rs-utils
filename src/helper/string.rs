@@ -1,3 +1,4 @@
+
 /// Truncate string
 ///
 /// ## Example
@@ -34,6 +35,25 @@ pub fn clean(text: String) -> String {
 pub fn clean_truncate(text: String, max: usize) -> String {
     let cleaned = clean(text);
     truncate(cleaned,max)
+}
+
+/// Generate uuid
+pub fn uuid() -> String {
+    use uuid::Uuid;
+
+    Uuid::new_v4().to_string()
+}
+
+/// Generate nanoid
+///
+/// Default length: 15
+pub fn nanoid(length: Option<usize>) -> String {
+    use nanoid::nanoid as create_nanoid;
+
+    let len = length.unwrap_or(15);
+
+    let created = create_nanoid!(len);
+    created
 }
 
 #[cfg(test)]
