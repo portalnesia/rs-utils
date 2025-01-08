@@ -1,0 +1,11 @@
+[package]
+name = "pn_utils"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aes = "0.8"                  # AES implementation
+cbc = "0.1.2"                  # CBC mode
+cipher = "0.4"               # Unified traits for cryptographic ciphers
+hex = "0.4"                  # For hex encoding/decoding
+rand = "0.8"                 # For generating random IVs
