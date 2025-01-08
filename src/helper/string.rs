@@ -3,7 +3,10 @@
 ///
 /// ## Example
 ///
-/// "lorem ipsum lorem ipsum lorem ipsum" => "lorem ipsum lor..."
+/// ```
+/// let result = utils::helper::truncate("lorem ipsum lorem ipsum lorem ipsum".to_string(),18);
+/// // result == lorem ipsum lor...
+/// ```
 pub fn truncate(text: String, max: usize) -> String {
     if max > text.len() {
         text
@@ -18,8 +21,9 @@ pub fn truncate(text: String, max: usize) -> String {
 ///
 /// ## Example
 ///
-/// ```html
-/// XSS<script>attack</script>
+/// ```
+/// let result = utils::helper::clean("XSS<script>attack</script>".to_string());
+/// // result == "XSS"
 ///```
 pub fn clean(text: String) -> String {
     use sanitize_html::sanitize_str;
@@ -56,6 +60,27 @@ pub fn nanoid(length: Option<usize>) -> String {
     created
 }
 
+/// Capitalize each first character in sentences
+///
+/// ## Example
+///
+/// ```
+/// utils::helper::ucwords("hello world"); // Hello World
+/// ```
+pub fn ucwords(sentence: &str) -> String {
+    sentence
+        .split_whitespace()
+        .map(|word| {
+            let mut chars = word.chars();
+            chars
+                .next()
+                .map(|c| c.to_uppercase().collect::<String>())
+                .unwrap_or_default() + chars.as_str()
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -78,7 +103,6 @@ mod tests {
     fn test_clean() {
         let html = r#"<p>Hello World</p>"#;
         let clean_text = clean(html.to_string());
-        println!("Cleaned text: {}",clean_text);
         assert_eq!(clean_text, "Hello World".to_string());
     }
 
@@ -86,7 +110,13 @@ mod tests {
     fn test_clean_and_truncate() {
         let html = r#"<p>Hello World This is Long Text</p>"#;
         let clean_text = clean_truncate(html.to_string(),19);
-        println!("Cleaned text: {}",clean_text);
         assert_eq!(clean_text, "Hello World This...".to_string());
+    }
+
+    #[test]
+    fn test_ucwords() {
+        let text = "hello world this is text";
+        let result = ucwords(text);
+        assert_eq!(result, "Hello World This Is Text".to_string());
     }
 }
