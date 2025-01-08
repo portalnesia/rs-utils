@@ -5,16 +5,33 @@ use hex;
 use rand::Rng;
 use std::error::Error;
 
+/// Crypto instance
 pub struct Crypto {
     key: Vec<u8>,
 }
 
 impl Crypto {
+    /// Create new crypto instance with secret string
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// let crypto = utils::Crypto::new("this is secret key".to_string());
+    /// ```
     pub fn new(secret: String) -> Self {
         let key = secret.as_bytes().to_vec();
         Crypto { key }
     }
 
+    /// Encrypt string data
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// let crypto = utils::Crypto::new("this is secret key".to_string());
+    /// let encrypted_data = crypto.encrypt("hidden text".to_string()).expect("error when encrypting data");
+    /// println!("{}",encrypted_data);
+    /// ```
     pub fn encrypt(&self, data: String) -> Result<String, Box<dyn Error>> {
         let plain_text = data.as_bytes();
 
@@ -48,6 +65,16 @@ impl Crypto {
         Ok(formatted)
     }
 
+    /// Decrypt string data
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// let crypto = utils::Crypto::new("this is secret key".to_string());
+    /// let encrypted_data = "0923gnj92bnwio9GJWIFWB"; // this is just an example
+    /// let decrypted_data = crypto.decrypt(encrypted_data.to_string());
+    /// println!("{}",decrypted_data);
+    /// ```
     pub fn decrypt(&self, encrypted: String) -> Result<String, Box<dyn Error>> {
         if encrypted.is_empty() {
             return Ok(String::new());
@@ -121,7 +148,9 @@ mod tests {
     #[test]
     fn encryption() {
         let crypto = Crypto::new("c67106b30d41345119309c05d1c4ab28".to_string());
-        let _encrypted = crypto.encrypt(String::from("halo ini data")).expect("Failed to encrypt");
+        let _encrypted = crypto
+            .encrypt(String::from("halo ini data"))
+            .expect("Failed to encrypt");
     }
 
     #[test]
