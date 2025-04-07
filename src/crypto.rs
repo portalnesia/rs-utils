@@ -3,6 +3,7 @@ use cbc::{Decryptor, Encryptor};
 use cipher::{BlockDecryptMut, BlockEncryptMut, KeyIvInit};
 use hex;
 use rand::Rng;
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 
 /// Crypto instance
@@ -44,7 +45,10 @@ impl Crypto {
         rand::thread_rng().fill(&mut iv);
 
         // Inisialisasi encryptor
-        let mut encryptor = Encryptor::<Aes256>::new_from_slices(&self.key, &iv).unwrap();
+        let mut encryptor = match Encryptor::<Aes256>::new_from_slices(&self.key, &iv) {
+            Ok(data) => data,
+            Err(e) => return Err(format!("{}",e))?
+        };
 
         // Tambahkan padding PKCS7
         let mut buffer = pad_pkcs7(plain_text, 16);
@@ -65,6 +69,22 @@ impl Crypto {
         Ok(formatted)
     }
 
+    /// Encrypt struct data
+    ///
+    /// Jsonify the data and encrypt
+    pub fn encrypt_json<T>(&self, data: &T) -> Result<String, Box<dyn Error>>
+    where T: ?Sized + Serialize
+    {
+        use serde_json::to_string;
+
+        let data_string = match to_string(data) {
+            Ok(dt) => dt,
+            Err(e) => return Err(e.into())
+        };
+
+        self.encrypt(data_string)
+    }
+
     /// Decrypt string data
     ///
     /// ## Example
@@ -77,7 +97,7 @@ impl Crypto {
     /// ```
     pub fn decrypt(&self, encrypted: String) -> Result<String, Box<dyn Error>> {
         if encrypted.is_empty() {
-            return Ok(String::new());
+            return Err("data is empty".into())
         }
 
         // Split encrypted data menjadi IV dan ciphertext
@@ -88,7 +108,10 @@ impl Crypto {
 
         // Gabungkan kembali bagian encrypted
         let encrypted_data = format!("{}{}", parts[0], parts[1]);
-        let cipher_text = hex::decode(encrypted_data)?;
+        let cipher_text = match hex::decode(encrypted_data) {
+            Ok(data) => data,
+            Err(e) => return Err(format!("Failed decode hex: {}",e))?
+        };
 
         if cipher_text.len() < 16 {
             return Err("Ciphertext too short.".into());
@@ -104,7 +127,10 @@ impl Crypto {
         }
 
         // Inisialisasi decryptor
-        let mut decryptor = Decryptor::<Aes256>::new_from_slices(&self.key, iv).unwrap();
+        let mut decryptor = match Decryptor::<Aes256>::new_from_slices(&self.key, iv) {
+            Ok(dt) => dt,
+            Err(e) => return Err(format!("{}",e))?
+        };
 
         // Buat buffer untuk dekripsi
         let mut buffer = cipher_text.to_vec();
@@ -115,9 +141,38 @@ impl Crypto {
         }
 
         // Hapus padding PKCS7
-        let unpadded = unpad_pkcs7(&buffer)?;
-        let decrypted_text = String::from_utf8(unpadded)?;
+        let unpadded = match unpad_pkcs7(&buffer) {
+            Ok(dt) => dt,
+            Err(e) => return Err(format!("Failed unpadded: {}",e))?
+        };
+        let decrypted_text = match String::from_utf8(unpadded) {
+            Ok(dt) => dt,
+            Err(e) => return Err(format!("Failed to convert to string: {}",e))?
+        };
         Ok(decrypted_text)
+    }
+
+    /// Decrypt string to struct
+    ///
+    /// Decrypt data and parse to struct
+    pub fn decrypt_json<T>(&self, data: String) -> Result<T, Box<dyn Error>>
+    where T: for<'a> Deserialize<'a>,
+    {
+        use serde_json::from_str;
+
+        let decrypted = match self.decrypt(data) {
+            Ok(decrypted) => decrypted,
+            Err(err) => return Err(err),
+        };
+
+        let data: T = match from_str(&decrypted) {
+            Ok(data) => data,
+            Err(err) =>  {
+                return Err(err.into())
+            }
+        };
+
+        Ok(data)
     }
 }
 
@@ -128,28 +183,44 @@ fn pad_pkcs7(data: &[u8], block_size: usize) -> Vec<u8> {
     padded_data
 }
 
-fn unpad_pkcs7(data: &[u8]) -> Result<Vec<u8>, &'static str> {
+fn unpad_pkcs7(data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
     if let Some(&padding_len) = data.last() {
         if padding_len as usize > data.len() {
-            return Err("Invalid padding");
+            return Err("Invalid padding".into());
         }
         let pad_start = data.len() - padding_len as usize;
         if data[pad_start..].iter().all(|&byte| byte == padding_len) {
             return Ok(data[..pad_start].to_vec());
         }
     }
-    Err("Invalid padding")
+    Err("Invalid padding".into())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Serialize, Deserialize)]
+    struct IData {
+        name: String,
+        age: usize
+    }
 
     #[test]
     fn encryption() {
         let crypto = Crypto::new("c67106b30d41345119309c05d1c4ab28".to_string());
         let _encrypted = crypto
             .encrypt(String::from("halo ini data"))
+            .expect("Failed to encrypt");
+    }
+
+    #[test]
+    fn encryption_json() {
+        let crypto = Crypto::new("c67106b30d41345119309c05d1c4ab28".to_string());
+
+        let _encrypted = crypto
+            .encrypt_json(&IData{name: String::from("Putu"),age:10})
             .expect("Failed to encrypt");
     }
 
@@ -162,5 +233,17 @@ mod tests {
 
         let decrypted = crypto.decrypt(encrypted).expect("Failed to decrypt");
         assert_eq!(data, decrypted)
+    }
+
+    #[test]
+    fn decryption_json() {
+        let crypto = Crypto::new("c67106b30d41345119309c05d1c4ab28".to_string());
+
+        let origin_data = IData{name: String::from("Putu"),age:10};
+        let _encrypted = crypto.encrypt_json(&origin_data).expect("Failed to encrypt");
+        let _decrypted: IData = crypto.decrypt_json(_encrypted).expect("Failet to decrypt");
+
+        assert_eq!(origin_data.name, _decrypted.name);
+        assert_eq!(origin_data.age, _decrypted.age);
     }
 }

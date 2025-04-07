@@ -1,6 +1,6 @@
 extern crate utils;
-
-use crate::utils::helper::{truncate,clean,uuid,nanoid};
+use utils::helper::{truncate, clean, uuid,ALPHANUMERIC_CHARS};
+use utils::{nanoid,first_letter};
 
 fn main() {
     // truncate
@@ -18,6 +18,21 @@ fn main() {
     println!("uuid: {}",uid);
 
     // nanoid
-    let nid = nanoid(Some(15));
-    println!("nanoid: {}",nid);
+    let nid = nanoid!();
+    println!("simple nanoid: {}",nid);
+
+    let nid = nanoid!(30);
+    println!("nanoid with length: {}",nid);
+
+    let nid = nanoid!(&ALPHANUMERIC_CHARS);
+    println!("nanoid with custom characters: {}",nid);
+
+    let nid = nanoid!(&ALPHANUMERIC_CHARS,30);
+    println!("nanoid with custom characters and length: {}",nid);
+
+    let fl = first_letter!("Hello World".to_string());
+    println!("first letter: {}",fl);
+
+    let fl = first_letter!("Hello World From Rust".to_string(),2);
+    println!("first letter with max: {}",fl);
 }

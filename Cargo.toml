@@ -13,11 +13,15 @@ bcrypt = "0.16.0"
 sanitize_html = "0.8.1"                     # To clean HTML
 regex = "1.11.1"
 nanoid = "0.4.0"
+serde = { version = "1.0.215", features = ["derive"] }
+serde_json = "1.0"
+url = "2.5.4"
 
 [dependencies.uuid]
-version = "1.11.0"
+version = "1.16.0"
 features = [
-    "v4",                # Lets you generate random UUIDs
+    "v7",                # Lets you generate random UUIDs
     "fast-rng",          # Use a faster (but still sufficiently random) RNG
     "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+    "serde"
 ]
