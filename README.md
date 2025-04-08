@@ -4,9 +4,9 @@
 [![MIT licensed][mit-badge]][mit-url]
 ![Test](https://github.com/portalnesia/rs-utils/actions/workflows/rust.yml/badge.svg)
 
-[crates-badge]: https://img.shields.io/crates/v/pn-utils.svg
+[crates-badge]: https://img.shields.io/crates/v/pn_utils.svg
 
-[crates-url]: https://crates.io/crates/pn-utils
+[crates-url]: https://crates.io/crates/pn_utils
 
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 

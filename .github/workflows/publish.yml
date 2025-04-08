@@ -1,0 +1,60 @@
+name: Publish to crates.io
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Cache Cargo registry & git index
+      - name: Cache cargo registry & git index
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      # 3. Cache compiled artifacts
+      - name: Cache compiled artifacts
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-
+
+      # 4. Install Rust (stable) + components
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: clippy, rustfmt
+
+      # 5. Run formatting check
+      - name: Check formatting
+        run: cargo fmt -- --check
+
+      # 6. Run lints
+      - name: Run Clippy
+        run: cargo clippy -- -D warnings
+
+      # 7. Run tests
+      - name: Run tests
+        run: cargo test --verbose
+
+      # 8. Publish to crates.io
+      - name: Publish crate
+        env:
+          CARGO_TOKEN: ${{ secrets.CARGO_TOKEN }}
+        run: cargo publish --token "$CARGO_TOKEN"
