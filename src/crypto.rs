@@ -37,7 +37,7 @@ impl Crypto {
     ///
     /// ```
     /// let crypto = pn_utils::Crypto::new("this is secret key".to_string());
-    /// let encrypted_data = crypto.encrypt("hidden text".to_string()).unwrap_or("failed".to_string());
+    /// let encrypted_data = crypto.encrypt("hidden text".to_string()).map_or("failed".to_string(),|result| result);
     /// println!("{}",encrypted_data);
     /// ```
     pub fn encrypt(&self, data: String) -> Result<String, Box<dyn Error>> {
@@ -53,13 +53,13 @@ impl Crypto {
         let mut rng = OsRng;
         match rng.try_fill_bytes(&mut iv) {
             Ok(_) => {}
-            Err(e) => return Err(format!("{}", e))?,
+            Err(e) => return Err(e.to_string().into()),
         };
 
         // Inisialisasi encryptor
         let mut encryptor = match Encryptor::<Aes256>::new_from_slices(&self.key, &iv) {
             Ok(data) => data,
-            Err(e) => return Err(format!("{}", e))?,
+            Err(e) => return Err(e.to_string().into()),
         };
 
         // Tambahkan padding PKCS7
@@ -106,7 +106,7 @@ impl Crypto {
     /// let crypto = pn_utils::Crypto::new("this is secret key".to_string());
     /// let encrypted_data = "0923gnj92bnwio9GJWIFWB"; // this is just an example
     /// let decrypted_data = crypto.decrypt(encrypted_data.to_string());
-    /// println!("{}",decrypted_data.unwrap_or("failed".to_string()));
+    /// println!("{}",decrypted_data.map_or("failed".to_string(),|result| result));
     /// ```
     pub fn decrypt(&self, encrypted: String) -> Result<String, Box<dyn Error>> {
         if encrypted.is_empty() {
@@ -142,7 +142,7 @@ impl Crypto {
         // Inisialisasi decryptor
         let mut decryptor = match Decryptor::<Aes256>::new_from_slices(&self.key, iv) {
             Ok(dt) => dt,
-            Err(e) => return Err(format!("{}", e))?,
+            Err(e) => return Err(e.to_string().into()),
         };
 
         // Buat buffer untuk dekripsi

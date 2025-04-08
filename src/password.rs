@@ -13,7 +13,7 @@ use bcrypt::{hash, verify, BcryptError, DEFAULT_COST};
 ///
 /// ```
 /// let hashed = pn_utils::password::hash_password("this is secret password".to_string());
-/// println!("{}",hashed.unwrap_or("failed".to_string()));
+/// println!("{}",hashed.map_or("failed".to_string(),|result| result));
 /// ```
 pub fn hash_password(password: String) -> Result<String, BcryptError> {
     hash(password, DEFAULT_COST)
@@ -30,7 +30,7 @@ pub fn hash_password(password: String) -> Result<String, BcryptError> {
 /// println!("is password valid? {}",is_password_valid);
 /// ```
 pub fn compare_password(password: String, hashed_password: String) -> bool {
-    verify(password, hashed_password.as_str()).unwrap_or(false)
+    verify(password, hashed_password.as_str()).map_or(false, |result| result)
 }
 
 #[cfg(test)]
