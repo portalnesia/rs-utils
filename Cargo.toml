@@ -9,7 +9,7 @@ readme = "README.md"
 homepage = "https://portalnesia.com"
 repository = "https://github.com/portalnesia/rs-utils"
 license = "MIT"
-
+exclude = [".gitignore"]
 
 [dependencies]
 aes = "0.8"                  # AES implementation
