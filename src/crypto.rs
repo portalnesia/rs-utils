@@ -8,7 +8,8 @@
 use aes::Aes256;
 use cbc::{Decryptor, Encryptor};
 use cipher::{BlockDecryptMut, BlockEncryptMut, KeyIvInit};
-use rand::Rng;
+use rand::rngs::OsRng;
+use rand::TryRngCore;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
@@ -48,7 +49,12 @@ impl Crypto {
 
         // Generate IV secara acak
         let mut iv = [0u8; 16];
-        rand::rng().fill(&mut iv);
+        // rand::rng().fill(&mut iv);
+        let mut rng = OsRng;
+        match rng.try_fill_bytes(&mut iv) {
+            Ok(_) => {}
+            Err(e) => return Err(format!("{}", e))?,
+        };
 
         // Inisialisasi encryptor
         let mut encryptor = match Encryptor::<Aes256>::new_from_slices(&self.key, &iv) {
