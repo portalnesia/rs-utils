@@ -12,7 +12,7 @@ use bcrypt::{hash, verify, BcryptError, DEFAULT_COST};
 /// ## Example
 ///
 /// ```
-/// let hashed = utils::password::hash_password("this is secret password".to_string());
+/// let hashed = pn_utils::password::hash_password("this is secret password".to_string());
 /// println!("{}",hashed.unwrap_or("failed".to_string()));
 /// ```
 pub fn hash_password(password: String) -> Result<String, BcryptError> {
@@ -26,7 +26,7 @@ pub fn hash_password(password: String) -> Result<String, BcryptError> {
 /// ```
 /// let password = "this is secret password";
 /// let hashed_password = "$2b$12$jfIoU3eWvkujdHnwpDf01ek0zKHNxOxVn7ifbEMV4eIPE.j7ZWBR."; // This is only examples
-/// let is_password_valid = utils::password::compare_password(password.to_string(),hashed_password.to_string());
+/// let is_password_valid = pn_utils::password::compare_password(password.to_string(),hashed_password.to_string());
 /// println!("is password valid? {}",is_password_valid);
 /// ```
 pub fn compare_password(password: String, hashed_password: String) -> bool {

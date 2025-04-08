@@ -5,9 +5,9 @@
  * Written by Putu Aditya <aditya@portalnesia.com>
  */
 
-extern crate utils;
+extern crate pn_utils;
 
-use crate::utils::password::{compare_password, hash_password};
+use crate::pn_utils::password::{compare_password, hash_password};
 
 fn main() {
     let password = "my_secret_password";

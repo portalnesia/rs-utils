@@ -67,16 +67,16 @@ impl Truthy for &str {
 ///
 /// # Example
 /// ```
-/// assert!(utils::is_true!(1_i32));
-/// assert!(!utils::is_true!(2_i32));
-/// assert!(utils::is_true!(1.0_f64));
-/// assert!(!utils::is_true!(0.5_f64));
-/// assert!(utils::is_true!(String::from("true")));
-/// assert!(!utils::is_true!(String::from("false")));
-/// assert!(utils::is_true!("true"));
-/// assert!(!utils::is_true!("false"));
-/// assert!(utils::is_true!(true));
-/// assert!(!utils::is_true!(false));
+/// assert!(pn_utils::is_true!(1_i32));
+/// assert!(!pn_utils::is_true!(2_i32));
+/// assert!(pn_utils::is_true!(1.0_f64));
+/// assert!(!pn_utils::is_true!(0.5_f64));
+/// assert!(pn_utils::is_true!(String::from("true")));
+/// assert!(!pn_utils::is_true!(String::from("false")));
+/// assert!(pn_utils::is_true!("true"));
+/// assert!(!pn_utils::is_true!("false"));
+/// assert!(pn_utils::is_true!(true));
+/// assert!(!pn_utils::is_true!(false));
 /// ```
 #[macro_export]
 macro_rules! is_true {

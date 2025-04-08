@@ -23,7 +23,7 @@ impl Crypto {
     /// ## Example
     ///
     /// ```
-    /// let crypto = utils::Crypto::new("this is secret key".to_string());
+    /// let crypto = pn_utils::Crypto::new("this is secret key".to_string());
     /// ```
     pub fn new(secret: String) -> Self {
         let key = secret.as_bytes().to_vec();
@@ -35,7 +35,7 @@ impl Crypto {
     /// ## Example
     ///
     /// ```
-    /// let crypto = utils::Crypto::new("this is secret key".to_string());
+    /// let crypto = pn_utils::Crypto::new("this is secret key".to_string());
     /// let encrypted_data = crypto.encrypt("hidden text".to_string()).unwrap_or("failed".to_string());
     /// println!("{}",encrypted_data);
     /// ```
@@ -48,7 +48,7 @@ impl Crypto {
 
         // Generate IV secara acak
         let mut iv = [0u8; 16];
-        rand::thread_rng().fill(&mut iv);
+        rand::rng().fill(&mut iv);
 
         // Inisialisasi encryptor
         let mut encryptor = match Encryptor::<Aes256>::new_from_slices(&self.key, &iv) {
@@ -97,7 +97,7 @@ impl Crypto {
     /// ## Example
     ///
     /// ```
-    /// let crypto = utils::Crypto::new("this is secret key".to_string());
+    /// let crypto = pn_utils::Crypto::new("this is secret key".to_string());
     /// let encrypted_data = "0923gnj92bnwio9GJWIFWB"; // this is just an example
     /// let decrypted_data = crypto.decrypt(encrypted_data.to_string());
     /// println!("{}",decrypted_data.unwrap_or("failed".to_string()));

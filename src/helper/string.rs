@@ -13,7 +13,7 @@ use url::{ParseError, Url};
 /// ## Example
 ///
 /// ```
-/// let result = utils::helper::truncate("lorem ipsum lorem ipsum lorem ipsum".to_string(),18);
+/// let result = pn_utils::helper::truncate("lorem ipsum lorem ipsum lorem ipsum".to_string(),18);
 /// // result == lorem ipsum lor...
 /// ```
 pub fn truncate(text: String, max: usize) -> String {
@@ -31,7 +31,7 @@ pub fn truncate(text: String, max: usize) -> String {
 /// ## Example
 ///
 /// ```
-/// let result = utils::helper::clean("XSS<script>attack</script>".to_string());
+/// let result = pn_utils::helper::clean("XSS<script>attack</script>".to_string());
 /// // result == "XSS"
 ///```
 pub fn clean(text: String) -> String {
@@ -49,10 +49,10 @@ pub fn clean(text: String) -> String {
 /// ## Example
 ///
 /// ```
-/// let result = utils::helper::clean_truncate("XSS<script>attack</script>".to_string(), 5);
+/// let result = pn_utils::helper::clean_truncate("XSS<script>attack</script>".to_string(), 5);
 /// // result == "XSS..."
 ///
-/// let result = utils::helper::clean_truncate("XSS<script>attack</script>".to_string(), 10);
+/// let result = pn_utils::helper::clean_truncate("XSS<script>attack</script>".to_string(), 10);
 /// // result == "XSS"
 /// ```
 /// Clean text data and truncate
@@ -66,7 +66,7 @@ pub fn clean_truncate(text: String, max: usize) -> String {
 /// ## Example
 ///
 /// ```
-/// use utils::helper;
+/// use pn_utils::helper;
 ///
 /// let id = helper::uuid();
 ///
@@ -140,7 +140,7 @@ pub fn nanoid_format(chars: &[char], length: usize) -> String {
 /// Example
 ///
 /// ```
-/// let result = utils::nanoid!();
+/// let result = pn_utils::nanoid!();
 /// ```
 ///
 /// ### 2. nanoid with length parameter
@@ -150,7 +150,7 @@ pub fn nanoid_format(chars: &[char], length: usize) -> String {
 /// Example
 ///
 /// ```
-/// let result = utils::nanoid!(30);
+/// let result = pn_utils::nanoid!(30);
 ///```
 ///
 /// ### 3. nanoid with custom characters and default length
@@ -160,9 +160,9 @@ pub fn nanoid_format(chars: &[char], length: usize) -> String {
 /// Example
 ///
 /// ```
-/// let result = utils::nanoid!(&['1','2','3','4','5']);
+/// let result = pn_utils::nanoid!(&['1','2','3','4','5']);
 ///
-/// let result = utils::nanoid!(&utils::helper::ALPHANUMERIC_CHARS);
+/// let result = pn_utils::nanoid!(&pn_utils::helper::ALPHANUMERIC_CHARS);
 ///```
 ///
 /// ### 4. nanoid with custom characters and length parameter
@@ -170,7 +170,7 @@ pub fn nanoid_format(chars: &[char], length: usize) -> String {
 /// ## Example
 ///
 /// ```
-/// let result = utils::nanoid!(&utils::helper::ALPHANUMERIC_CHARS,30);
+/// let result = pn_utils::nanoid!(&pn_utils::helper::ALPHANUMERIC_CHARS,30);
 ///```
 #[macro_export]
 macro_rules! nanoid {
@@ -197,7 +197,7 @@ macro_rules! nanoid {
 /// ## Example
 ///
 /// ```
-/// utils::helper::ucwords("hello world"); // Hello World
+/// pn_utils::helper::ucwords("hello world"); // Hello World
 /// ```
 pub fn ucwords(sentence: &str) -> String {
     sentence
@@ -234,9 +234,9 @@ pub fn first_letter_function(words: String, max: usize) -> String {
 /// Example
 ///
 /// ```
-/// let letter = utils::first_letter!("Hello world".to_string()); // HW
+/// let letter = pn_utils::first_letter!("Hello world".to_string()); // HW
 ///
-/// let letter = utils::first_letter!("Hello world from rust".to_string(),2); // HW
+/// let letter = pn_utils::first_letter!("Hello world from rust".to_string(),2); // HW
 /// ```
 #[macro_export]
 macro_rules! first_letter {
@@ -280,7 +280,7 @@ pub fn slug(input: &str) -> String {
 /// # Example
 ///
 /// ```
-/// use utils::helper::is_url;
+/// use pn_utils::helper::is_url;
 ///
 /// assert_eq!(is_url("https://portalnesia.com".to_string()), true);
 /// assert_eq!(is_url("invalid-url".to_string()), false);
@@ -313,7 +313,7 @@ pub fn is_twitter_url(url: String) -> bool {
 /// # Example
 ///
 /// ```
-/// assert_eq!(utils::helper::capitalize_first("hello".to_string()), "Hello");
+/// assert_eq!(pn_utils::helper::capitalize_first("hello".to_string()), "Hello");
 /// ```
 
 pub fn capitalize_first(s: String) -> String {
@@ -339,8 +339,8 @@ pub fn capitalize_first(s: String) -> String {
 /// # Example
 ///
 /// ```
-/// assert_eq!(utils::helper::validate_email("support@portalnesia.com".to_string()), true);
-/// assert_eq!(utils::helper::validate_email("invalid-email".to_string()), false);
+/// assert_eq!(pn_utils::helper::validate_email("support@portalnesia.com".to_string()), true);
+/// assert_eq!(pn_utils::helper::validate_email("invalid-email".to_string()), false);
 /// ```
 pub fn validate_email(email: String) -> bool {
     let re = Regex::new(r"^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$").unwrap();

@@ -36,13 +36,13 @@ checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
 name = "bcrypt"
-version = "0.16.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b1866ecef4f2d06a0bb77880015fdf2b89e25a1c2e5addacb87e459c86dc67e"
+checksum = "92758ad6077e4c76a6cadbce5005f666df70d4f13b19976b1a8062eef880040f"
 dependencies = [
  "base64",
  "blowfish",
- "getrandom 0.2.15",
+ "getrandom 0.3.2",
  "subtle",
  "zeroize",
 ]
@@ -540,6 +540,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "pn_utils"
+version = "0.1.0"
+dependencies = [
+ "aes",
+ "bcrypt",
+ "cbc",
+ "cipher",
+ "hex",
+ "nanoid",
+ "rand 0.9.0",
+ "regex",
+ "sanitize_html",
+ "serde",
+ "serde_json",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "ppv-lite86"
 version = "0.2.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -871,25 +890,6 @@ name = "utf8_iter"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
-
-[[package]]
-name = "utils"
-version = "0.1.0"
-dependencies = [
- "aes",
- "bcrypt",
- "cbc",
- "cipher",
- "hex",
- "nanoid",
- "rand 0.8.5",
- "regex",
- "sanitize_html",
- "serde",
- "serde_json",
- "url",
- "uuid",
-]
 
 [[package]]
 name = "uuid"

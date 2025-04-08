@@ -5,9 +5,9 @@
  * Written by Putu Aditya <aditya@portalnesia.com>
  */
 
-extern crate utils;
-use utils::helper::{clean, truncate, uuid, ALPHANUMERIC_CHARS};
-use utils::{first_letter, is_true, nanoid};
+extern crate pn_utils;
+use pn_utils::helper::{clean, truncate, uuid, ALPHANUMERIC_CHARS};
+use pn_utils::{first_letter, is_true, nanoid};
 
 fn main() {
     // truncate

@@ -91,9 +91,9 @@ pub fn format_number_function(
 /// Example
 ///
 /// ```
-/// utils::format_number!(5000.0);
-/// utils::format_number!(1234567.89, 2);
-/// utils::format_number!(5000.0, 0, ',', '.');
+/// pn_utils::format_number!(5000.0);
+/// pn_utils::format_number!(1234567.89, 2);
+/// pn_utils::format_number!(5000.0, 0, ',', '.');
 /// ```
 #[macro_export]
 macro_rules! format_number {
@@ -114,14 +114,16 @@ pub struct FormatShortResponse {
     format: String,
 }
 
-/// Ubah angka jadi format singkat dengan suffix:
-/// - K untuk ribu (10³)
-/// - M untuk juta (10⁶)
-/// - B untuk miliar (10⁹)
+/// Format a number into a short format with a suffix:
+/// - K for thousand (10³)
+/// - M for million (10⁶)
+/// - B for billion (10⁹)
 ///
-/// Jika < 1 000, dikembalikan apa adanya (tanpa suffix).
+/// If the number is < 1 000, it is returned as is (without a suffix).
 ///
-/// Precision mengatur jumlah angka di belakang koma.
+/// Precision sets the number of digits after the decimal point.
+///
+/// Example: 1500 => 1.50 K
 pub fn format_short_number(value: f64, precision: usize) -> FormatShortResponse {
     // ambil nilai absolut untuk threshold, tapi pertahankan tanda asli
     let sign = if value.is_sign_negative() { "-" } else { "" };
