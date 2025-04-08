@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) Portalnesia - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Putu Aditya <aditya@portalnesia.com>
+ */
+
+use regex::Regex;
 use url::{ParseError, Url};
 
 /// Truncate string
@@ -27,66 +35,101 @@ pub fn truncate(text: String, max: usize) -> String {
 /// // result == "XSS"
 ///```
 pub fn clean(text: String) -> String {
-    use sanitize_html::sanitize_str;
-    use sanitize_html::rules::predefined::DEFAULT;
     use regex::Regex;
+    use sanitize_html::rules::predefined::DEFAULT;
+    use sanitize_html::sanitize_str;
 
-    let cleaned = sanitize_str(&DEFAULT,text.as_str()).unwrap_or("".to_string());
+    let cleaned = sanitize_str(&DEFAULT, text.as_str()).unwrap_or("".to_string());
     let re = Regex::new(r"^\s+|\s+$").unwrap();
     re.replace_all(&cleaned, "").to_string()
 }
 
 /// Clean text data and truncate
+///
+/// ## Example
+///
+/// ```
+/// let result = utils::helper::clean_truncate("XSS<script>attack</script>".to_string(), 5);
+/// // result == "XSS..."
+///
+/// let result = utils::helper::clean_truncate("XSS<script>attack</script>".to_string(), 10);
+/// // result == "XSS"
+/// ```
+/// Clean text data and truncate
 pub fn clean_truncate(text: String, max: usize) -> String {
     let cleaned = clean(text);
-    truncate(cleaned,max)
+    truncate(cleaned, max)
 }
 
 /// Generate uuid
+///
+/// ## Example
+///
+/// ```
+/// use utils::helper;
+///
+/// let id = helper::uuid();
+///
+/// println!("UUID: {}", id);
+/// ```
 pub fn uuid() -> String {
-    use uuid::{Uuid,Timestamp,NoContext};
+    use uuid::{NoContext, Timestamp, Uuid};
     let ts = Timestamp::now(NoContext);
     Uuid::new_v7(ts).to_string()
 }
 
+/// An array of alphanumeric characters.
+///
+/// This constant contains all uppercase and lowercase letters, as well as the digits 0-9.
+/// It is commonly used for generating random strings or identifiers.
 pub const ALPHANUMERIC_CHARS: [char; 62] = [
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
-    'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-    'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+    'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B',
+    'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+    'V', 'W', 'X', 'Y', 'Z',
 ];
 
+/// An array of safe characters.
+///
+/// This constant contains alphanumeric characters, as well as the underscore and hyphen.
+/// It is commonly used for generating random strings or identifiers that are safe for use in URLs or file names.
 pub const SAFE_CHARS: [char; 64] = [
-    '_','-','0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+    '_', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
     'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
     'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
 
-
-pub fn parse_url(url: String) -> Result<String,ParseError> {
+/// Parses a URL string and returns a simplified version of the URL.
+///
+/// This function takes a URL string as input and returns a simplified version of the URL.
+/// The simplified URL consists of the host, path, and query parameters, with the "www." prefix removed.
+///
+/// # Arguments
+///
+/// * `url` - The URL string to parse.
+///
+pub fn parse_url(url: String) -> Result<String, ParseError> {
     let parsed = match Url::parse(&url) {
         Ok(url) => url,
-        Err(err) => {
-            return Err(err)
-        }
+        Err(err) => return Err(err),
     };
 
     let mut query = parsed.query().unwrap().to_string();
 
-    if query != "" {
-        query = format!("?{}",query);
+    if !query.is_empty() {
+        query = format!("?{}", query);
     }
 
-    let mut parser = format!("{}{}{}",parsed.host().unwrap(),parsed.path(),query);
+    let mut parser = format!("{}{}{}", parsed.host().unwrap(), parsed.path(), query);
     parser = parser.replacen("www.", "", 1);
     Ok(parser)
 }
 
-pub fn nanoid_format(chars: &[char],length: usize) -> String {
+pub fn nanoid_format(chars: &[char], length: usize) -> String {
     use nanoid::nanoid as create_nanoid;
 
-    let created = create_nanoid!(length,chars);
+    let created = create_nanoid!(length, chars);
 
     created
 }
@@ -133,19 +176,19 @@ pub fn nanoid_format(chars: &[char],length: usize) -> String {
 macro_rules! nanoid {
     // simple nanoid
     () => {
-        $crate::helper::nanoid_format(&$crate::helper::SAFE_CHARS,15)
+        $crate::helper::nanoid_format(&$crate::helper::SAFE_CHARS, 15)
     };
     // nanoid with length parameter
     ($size:tt) => {
-        $crate::helper::nanoid_format(&$crate::helper::SAFE_CHARS,$size)
+        $crate::helper::nanoid_format(&$crate::helper::SAFE_CHARS, $size)
     };
     // nanoid with custom characters and default length
     ($chars:expr) => {
-        $crate::helper::nanoid_format($chars,15)
+        $crate::helper::nanoid_format($chars, 15)
     };
     // nanoid with custom characters and length parameter
     ($chars:expr, $size:tt) => {
-        $crate::helper::nanoid_format($chars,$size)
+        $crate::helper::nanoid_format($chars, $size)
     };
 }
 
@@ -164,21 +207,20 @@ pub fn ucwords(sentence: &str) -> String {
             chars
                 .next()
                 .map(|c| c.to_uppercase().collect::<String>())
-                .unwrap_or_default() + chars.as_str()
+                .unwrap_or_default()
+                + chars.as_str()
         })
         .collect::<Vec<_>>()
         .join(" ")
 }
 
 pub fn first_letter_function(words: String, max: usize) -> String {
-    let letters = words
-        .split_whitespace()
-        .filter_map(|word| {
-            word.chars()
-                .next()
-                .filter(|c| c.is_alphabetic())
-                .map(|c| c.to_ascii_uppercase())
-        });
+    let letters = words.split_whitespace().filter_map(|word| {
+        word.chars()
+            .next()
+            .filter(|c| c.is_alphabetic())
+            .map(|c| c.to_ascii_uppercase())
+    });
 
     if max == 0 {
         letters.collect()
@@ -199,17 +241,17 @@ pub fn first_letter_function(words: String, max: usize) -> String {
 #[macro_export]
 macro_rules! first_letter {
     ($words:expr) => {
-        $crate::helper::first_letter_function($words,0)
+        $crate::helper::first_letter_function($words, 0)
     };
     ($words:expr,$size:tt) => {
-        $crate::helper::first_letter_function($words,$size)
+        $crate::helper::first_letter_function($words, $size)
     };
 }
 
 /// Slug format string to slugify
 ///
 /// Example: "hello world" => "hello-world"
-fn slug(input: &str) -> String {
+pub fn slug(input: &str) -> String {
     input
         .to_lowercase()
         .chars()
@@ -227,6 +269,82 @@ fn slug(input: &str) -> String {
         .filter(|s| !s.is_empty())
         .collect::<Vec<_>>()
         .join("-")
+}
+
+/// Checks if a given string is a valid URL.
+///
+/// # Arguments
+///
+/// * `url` - The URL string to check.
+///
+/// # Example
+///
+/// ```
+/// use utils::helper::is_url;
+///
+/// assert_eq!(is_url("https://portalnesia.com".to_string()), true);
+/// assert_eq!(is_url("invalid-url".to_string()), false);
+/// ```
+pub fn is_url(url: String) -> bool {
+    Url::parse(&url).is_ok()
+}
+
+/// Checks if a given string is a valid Twitter URL.
+///
+/// # Arguments
+///
+/// * `url` - The URL string to check.
+///
+pub fn is_twitter_url(url: String) -> bool {
+    if !is_url(url.clone()) {
+        return false;
+    }
+
+    let re = Regex::new(r"^https?://(www.)?twitter\.com").unwrap();
+    re.is_match(url.as_str())
+}
+
+/// Capitalizes the first character of a string.
+///
+/// # Arguments
+///
+/// * `s` - The string to capitalize.
+///
+/// # Example
+///
+/// ```
+/// assert_eq!(utils::helper::capitalize_first("hello".to_string()), "Hello");
+/// ```
+
+pub fn capitalize_first(s: String) -> String {
+    let trimmed = s.trim_start();
+    let mut chars = trimmed.chars();
+    match chars.next() {
+        None => String::new(),
+        Some(first) => {
+            // to_uppercase() bisa menghasilkan lebih dari satu char (Unicode)
+            let mut result = first.to_uppercase().collect::<String>();
+            result.push_str(chars.as_str());
+            result
+        }
+    }
+}
+
+/// Validates if a given string is a valid email address.
+///
+/// # Arguments
+///
+/// * `email` - The email string to validate.
+///
+/// # Example
+///
+/// ```
+/// assert_eq!(utils::helper::validate_email("support@portalnesia.com".to_string()), true);
+/// assert_eq!(utils::helper::validate_email("invalid-email".to_string()), false);
+/// ```
+pub fn validate_email(email: String) -> bool {
+    let re = Regex::new(r"^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$").unwrap();
+    re.is_match(email.as_str())
 }
 
 #[cfg(test)]
@@ -257,7 +375,7 @@ mod tests {
     #[test]
     fn test_clean_and_truncate() {
         let html = r#"<p>Hello World This is Long Text</p>"#;
-        let clean_text = clean_truncate(html.to_string(),19);
+        let clean_text = clean_truncate(html.to_string(), 19);
         assert_eq!(clean_text, "Hello World This...".to_string());
     }
 
@@ -275,7 +393,7 @@ mod tests {
         let str = nanoid!(30);
         assert_eq!(str.len(), 30);
 
-        let str = nanoid!(&['1','2','3','4','5']);
+        let str = nanoid!(&['1', '2', '3', '4', '5']);
         assert_eq!(str.len(), 15);
         assert!(
             str.chars().all(|c| c.is_numeric()),
@@ -283,7 +401,7 @@ mod tests {
             str
         );
 
-        let str = nanoid!(&['1','2','3','4','5'],20);
+        let str = nanoid!(&['1', '2', '3', '4', '5'], 20);
         assert_eq!(str.len(), 20);
         assert!(
             str.chars().all(|c| c.is_numeric()),
@@ -305,7 +423,7 @@ mod tests {
 
         let parsed = parse_url(url).expect("Failed parser url");
 
-        assert_eq!(parsed,"portalnesia.com/news?foo=bar");
+        assert_eq!(parsed, "portalnesia.com/news?foo=bar");
 
         assert!(parse_url("error url".to_string()).is_err());
         assert!(parse_url("https://err. https://".to_string()).is_err());
@@ -324,7 +442,7 @@ mod tests {
             ("Hello World From Rust", 2, "HW"),
             ("Hello World From Rust", 3, "HWF"),
             ("Hello World From Rust", 5, "HWFR"), // lebih dari jumlah kata yang valid
-            ("Hello 123 $World", 2, "H"), // angka/simbol diabaikan
+            ("Hello 123 $World", 2, "H"),         // angka/simbol diabaikan
         ];
 
         for (input, max, expected) in cases {
@@ -357,6 +475,79 @@ mod tests {
                 result, expected,
                 "slug({:?}) should be {:?}, got {:?}",
                 input, expected, result
+            );
+        }
+    }
+
+    #[test]
+    fn test_is_url() {
+        let cases = vec![("https://", false), ("https://portalnesia.com", true)];
+        for (input, expected) in cases {
+            let result = is_url(input.to_string());
+            assert_eq!(
+                result, expected,
+                "is_url({:?}) should be {:?}, got {:?}",
+                input, expected, result
+            );
+        }
+    }
+
+    #[test]
+    fn test_is_twitter_url() {
+        let cases = vec![
+            ("http://portalnesia.com/twitter.com/contact", false),
+            ("http://portalnesia.com/contact", false),
+            ("https://twitter.com/Portalnesia1", true),
+        ];
+        for (input, expected) in cases {
+            let result = is_twitter_url(input.to_string());
+            assert_eq!(
+                result, expected,
+                "is_url({:?}) should be {:?}, got {:?}",
+                input, expected, result
+            );
+        }
+    }
+
+    #[test]
+    fn test_capitalize_first() {
+        let cases = vec![
+            ("hello world".to_string(), "Hello world"),
+            ("Hello world".to_string(), "Hello world"),
+            ("rust".to_string(), "Rust"),
+            ("r".to_string(), "R"),
+            ("".to_string(), ""),
+            // unicode
+            ("äpfel sind lecker".to_string(), "Äpfel sind lecker"),
+            // non-letter first char tetap dipertahankan
+            ("123abc".to_string(), "123abc"),
+            (" multiple spaces".to_string(), "Multiple spaces"),
+        ];
+
+        for (input, expected) in cases {
+            let got = capitalize_first(input.clone());
+            assert_eq!(
+                got, expected,
+                "capitalize_first({:?}) should be {:?}, got {:?}",
+                input, expected, got
+            );
+        }
+    }
+
+    #[test]
+    fn test_validate_email() {
+        let cases = vec![
+            ("support@portalnesia".to_string(), false),
+            ("support@portalnesia.com".to_string(), true),
+            ("  support@portalnesia.com".to_string(), false),
+            ("support@portalnesia.com  ".to_string(), false),
+        ];
+        for (input, expected) in cases {
+            let got = validate_email(input.clone());
+            assert_eq!(
+                got, expected,
+                "validate_email({:?}) should be {:?}, got {:?}",
+                input, expected, got
             );
         }
     }

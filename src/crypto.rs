@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) Portalnesia - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Putu Aditya <aditya@portalnesia.com>
+ */
+
 use aes::Aes256;
 use cbc::{Decryptor, Encryptor};
 use cipher::{BlockDecryptMut, BlockEncryptMut, KeyIvInit};
-use hex;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
@@ -30,7 +36,7 @@ impl Crypto {
     ///
     /// ```
     /// let crypto = utils::Crypto::new("this is secret key".to_string());
-    /// let encrypted_data = crypto.encrypt("hidden text".to_string()).expect("error when encrypting data");
+    /// let encrypted_data = crypto.encrypt("hidden text".to_string()).unwrap_or("failed".to_string());
     /// println!("{}",encrypted_data);
     /// ```
     pub fn encrypt(&self, data: String) -> Result<String, Box<dyn Error>> {
@@ -47,7 +53,7 @@ impl Crypto {
         // Inisialisasi encryptor
         let mut encryptor = match Encryptor::<Aes256>::new_from_slices(&self.key, &iv) {
             Ok(data) => data,
-            Err(e) => return Err(format!("{}",e))?
+            Err(e) => return Err(format!("{}", e))?,
         };
 
         // Tambahkan padding PKCS7
@@ -73,13 +79,14 @@ impl Crypto {
     ///
     /// Jsonify the data and encrypt
     pub fn encrypt_json<T>(&self, data: &T) -> Result<String, Box<dyn Error>>
-    where T: ?Sized + Serialize
+    where
+        T: ?Sized + Serialize,
     {
         use serde_json::to_string;
 
         let data_string = match to_string(data) {
             Ok(dt) => dt,
-            Err(e) => return Err(e.into())
+            Err(e) => return Err(e.into()),
         };
 
         self.encrypt(data_string)
@@ -93,11 +100,11 @@ impl Crypto {
     /// let crypto = utils::Crypto::new("this is secret key".to_string());
     /// let encrypted_data = "0923gnj92bnwio9GJWIFWB"; // this is just an example
     /// let decrypted_data = crypto.decrypt(encrypted_data.to_string());
-    /// println!("{}",decrypted_data);
+    /// println!("{}",decrypted_data.unwrap_or("failed".to_string()));
     /// ```
     pub fn decrypt(&self, encrypted: String) -> Result<String, Box<dyn Error>> {
         if encrypted.is_empty() {
-            return Err("data is empty".into())
+            return Err("data is empty".into());
         }
 
         // Split encrypted data menjadi IV dan ciphertext
@@ -110,7 +117,7 @@ impl Crypto {
         let encrypted_data = format!("{}{}", parts[0], parts[1]);
         let cipher_text = match hex::decode(encrypted_data) {
             Ok(data) => data,
-            Err(e) => return Err(format!("Failed decode hex: {}",e))?
+            Err(e) => return Err(format!("Failed decode hex: {}", e))?,
         };
 
         if cipher_text.len() < 16 {
@@ -129,7 +136,7 @@ impl Crypto {
         // Inisialisasi decryptor
         let mut decryptor = match Decryptor::<Aes256>::new_from_slices(&self.key, iv) {
             Ok(dt) => dt,
-            Err(e) => return Err(format!("{}",e))?
+            Err(e) => return Err(format!("{}", e))?,
         };
 
         // Buat buffer untuk dekripsi
@@ -143,11 +150,11 @@ impl Crypto {
         // Hapus padding PKCS7
         let unpadded = match unpad_pkcs7(&buffer) {
             Ok(dt) => dt,
-            Err(e) => return Err(format!("Failed unpadded: {}",e))?
+            Err(e) => return Err(format!("Failed unpadded: {}", e))?,
         };
         let decrypted_text = match String::from_utf8(unpadded) {
             Ok(dt) => dt,
-            Err(e) => return Err(format!("Failed to convert to string: {}",e))?
+            Err(e) => return Err(format!("Failed to convert to string: {}", e))?,
         };
         Ok(decrypted_text)
     }
@@ -156,7 +163,8 @@ impl Crypto {
     ///
     /// Decrypt data and parse to struct
     pub fn decrypt_json<T>(&self, data: String) -> Result<T, Box<dyn Error>>
-    where T: for<'a> Deserialize<'a>,
+    where
+        T: for<'a> Deserialize<'a>,
     {
         use serde_json::from_str;
 
@@ -167,9 +175,7 @@ impl Crypto {
 
         let data: T = match from_str(&decrypted) {
             Ok(data) => data,
-            Err(err) =>  {
-                return Err(err.into())
-            }
+            Err(err) => return Err(err.into()),
         };
 
         Ok(data)
@@ -204,7 +210,7 @@ mod tests {
     #[derive(Serialize, Deserialize)]
     struct IData {
         name: String,
-        age: usize
+        age: usize,
     }
 
     #[test]
@@ -220,7 +226,10 @@ mod tests {
         let crypto = Crypto::new("c67106b30d41345119309c05d1c4ab28".to_string());
 
         let _encrypted = crypto
-            .encrypt_json(&IData{name: String::from("Putu"),age:10})
+            .encrypt_json(&IData {
+                name: String::from("Putu"),
+                age: 10,
+            })
             .expect("Failed to encrypt");
     }
 
@@ -239,8 +248,13 @@ mod tests {
     fn decryption_json() {
         let crypto = Crypto::new("c67106b30d41345119309c05d1c4ab28".to_string());
 
-        let origin_data = IData{name: String::from("Putu"),age:10};
-        let _encrypted = crypto.encrypt_json(&origin_data).expect("Failed to encrypt");
+        let origin_data = IData {
+            name: String::from("Putu"),
+            age: 10,
+        };
+        let _encrypted = crypto
+            .encrypt_json(&origin_data)
+            .expect("Failed to encrypt");
         let _decrypted: IData = crypto.decrypt_json(_encrypted).expect("Failet to decrypt");
 
         assert_eq!(origin_data.name, _decrypted.name);

@@ -1,18 +1,25 @@
+/*
+ * Copyright (c) Portalnesia - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Putu Aditya <aditya@portalnesia.com>
+ */
+
 use bcrypt::{hash, verify, BcryptError, DEFAULT_COST};
 
-/// HashPassword hashes the password using bcrypt
+/// Hashes the password using bcrypt
 ///
 /// ## Example
 ///
 /// ```
 /// let hashed = utils::password::hash_password("this is secret password".to_string());
-/// println!("{}",hashed);
+/// println!("{}",hashed.unwrap_or("failed".to_string()));
 /// ```
 pub fn hash_password(password: String) -> Result<String, BcryptError> {
     hash(password, DEFAULT_COST)
 }
 
-/// ComparePassword compares a password with a hashed password
+/// Compares a password with a hashed password
 ///
 /// ## Example
 ///
@@ -23,7 +30,7 @@ pub fn hash_password(password: String) -> Result<String, BcryptError> {
 /// println!("is password valid? {}",is_password_valid);
 /// ```
 pub fn compare_password(password: String, hashed_password: String) -> bool {
-    verify(password, hashed_password.as_str()).unwrap_or_else(|_| false)
+    verify(password, hashed_password.as_str()).unwrap_or(false)
 }
 
 #[cfg(test)]
