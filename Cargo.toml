@@ -2,10 +2,35 @@
 name = "pn_utils"
 version = "0.1.0"
 edition = "2021"
+authors = ["Putu Aditya <aditya@portalnesia.com>"]
+description = "Rust utility for Portalnesia"
+documentation = "https://docs.rs/pn_utils"
+readme = "README.md"
+homepage = "https://portalnesia.com"
+repository = "https://github.com/portalnesia/rs-utils"
+license = "MIT"
+exclude = [".gitignore"]
 
 [dependencies]
 aes = "0.8"                  # AES implementation
-cbc = "0.1.2"                  # CBC mode
+cbc = "0.1.2"                # CBC mode
 cipher = "0.4"               # Unified traits for cryptographic ciphers
-hex = "0.4"                  # For hex encoding/decoding
-rand = "0.8"                 # For generating random IVs
+hex = "0.4"                                 # For hex encoding/decoding
+rand = "0.9"                # For generating random IVs
+bcrypt = "0.17.0"
+sanitize_html = "0.8.1"                     # To clean HTML
+regex = "1.11.1"
+nanoid = "0.4.0"
+serde = { version = "1.0.215", features = ["derive"] }
+serde_json = "1.0"
+url = "2.5.4"
+lazy_static = "1.5.0"
+
+[dependencies.uuid]
+version = "1.16.0"
+features = [
+    "v7", # Lets you generate random UUIDs
+    "fast-rng", # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+    "serde"
+]

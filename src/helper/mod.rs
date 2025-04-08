@@ -5,8 +5,10 @@
  * Written by Putu Aditya <aditya@portalnesia.com>
  */
 
-mod crypto;
-pub mod helper;
-pub mod password;
+mod bool;
+mod number;
+mod string;
 
-pub use crypto::*;
+pub use bool::*;
+pub use number::*;
+pub use string::*;
