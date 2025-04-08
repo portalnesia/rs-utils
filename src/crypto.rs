@@ -168,10 +168,7 @@ impl Crypto {
     {
         use serde_json::from_str;
 
-        let decrypted = match self.decrypt(data) {
-            Ok(decrypted) => decrypted,
-            Err(err) => return Err(err),
-        };
+        let decrypted = self.decrypt(data)?;
 
         let data: T = match from_str(&decrypted) {
             Ok(data) => data,

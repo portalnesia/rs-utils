@@ -35,12 +35,17 @@ pub fn truncate(text: String, max: usize) -> String {
 /// // result == "XSS"
 ///```
 pub fn clean(text: String) -> String {
+    use lazy_static::lazy_static;
     use regex::Regex;
     use sanitize_html::rules::predefined::DEFAULT;
     use sanitize_html::sanitize_str;
 
     let cleaned = sanitize_str(&DEFAULT, text.as_str()).unwrap_or("".to_string());
-    let re = Regex::new(r"^\s+|\s+$").unwrap();
+
+    lazy_static! {
+        static ref re: Regex = Regex::new(r"^\s+|\s+$").unwrap();
+    }
+
     re.replace_all(&cleaned, "").to_string()
 }
 
@@ -110,10 +115,7 @@ pub const SAFE_CHARS: [char; 64] = [
 /// * `url` - The URL string to parse.
 ///
 pub fn parse_url(url: String) -> Result<String, ParseError> {
-    let parsed = match Url::parse(&url) {
-        Ok(url) => url,
-        Err(err) => return Err(err),
-    };
+    let parsed = Url::parse(&url)?;
 
     let mut query = parsed.query().unwrap().to_string();
 
@@ -296,11 +298,16 @@ pub fn is_url(url: String) -> bool {
 /// * `url` - The URL string to check.
 ///
 pub fn is_twitter_url(url: String) -> bool {
+    use lazy_static::lazy_static;
+    use regex::Regex;
+
     if !is_url(url.clone()) {
         return false;
     }
 
-    let re = Regex::new(r"^https?://(www.)?twitter\.com").unwrap();
+    lazy_static! {
+        static ref re: Regex = Regex::new(r"^https?://(www.)?twitter\.com").unwrap();
+    }
     re.is_match(url.as_str())
 }
 
@@ -315,7 +322,6 @@ pub fn is_twitter_url(url: String) -> bool {
 /// ```
 /// assert_eq!(pn_utils::helper::capitalize_first("hello".to_string()), "Hello");
 /// ```
-
 pub fn capitalize_first(s: String) -> String {
     let trimmed = s.trim_start();
     let mut chars = trimmed.chars();
@@ -343,7 +349,10 @@ pub fn capitalize_first(s: String) -> String {
 /// assert_eq!(pn_utils::helper::validate_email("invalid-email".to_string()), false);
 /// ```
 pub fn validate_email(email: String) -> bool {
-    let re = Regex::new(r"^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$").unwrap();
+    use lazy_static::lazy_static;
+    lazy_static! {
+        static ref re: Regex = Regex::new(r"^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$").unwrap();
+    }
     re.is_match(email.as_str())
 }
 
