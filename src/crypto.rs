@@ -37,7 +37,7 @@ impl Crypto {
     ///
     /// ```
     /// let crypto = pn_utils::Crypto::new("this is secret key".to_string());
-    /// let encrypted_data = crypto.encrypt("hidden text".to_string()).map_or("failed".to_string(),|result| result);
+    /// let encrypted_data = crypto.encrypt("hidden text".to_string()).unwrap_or("failed".to_string());
     /// println!("{}",encrypted_data);
     /// ```
     pub fn encrypt(&self, data: String) -> Result<String, Box<dyn Error>> {
@@ -106,7 +106,7 @@ impl Crypto {
     /// let crypto = pn_utils::Crypto::new("this is secret key".to_string());
     /// let encrypted_data = "0923gnj92bnwio9GJWIFWB"; // this is just an example
     /// let decrypted_data = crypto.decrypt(encrypted_data.to_string());
-    /// println!("{}",decrypted_data.map_or("failed".to_string(),|result| result));
+    /// println!("{}",decrypted_data.unwrap_or("failed".to_string()));
     /// ```
     pub fn decrypt(&self, encrypted: String) -> Result<String, Box<dyn Error>> {
         if encrypted.is_empty() {

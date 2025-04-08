@@ -40,7 +40,7 @@ pub fn clean(text: String) -> String {
     use sanitize_html::rules::predefined::DEFAULT;
     use sanitize_html::sanitize_str;
 
-    let cleaned = sanitize_str(&DEFAULT, text.as_str()).map_or("".to_string(), |result| result);
+    let cleaned = sanitize_str(&DEFAULT, text.as_str()).unwrap_or("".to_string());
 
     lazy_static! {
         static ref re: Regex = Regex::new(r"^\s+|\s+$").unwrap();
